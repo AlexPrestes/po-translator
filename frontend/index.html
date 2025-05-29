@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>po-translator</title>
+    <link rel="stylesheet" href="./src/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>po-translator</h1>
+
+      <div class="controls">
+        <input type="file" id="fileInput" accept=".po,.pot" />
+        <button id="downloadBtn">Baixar .po</button>
+      </div>
+
+      <div class="table-controls">
+        <input type="text" id="searchInput" placeholder="Buscar..." />
+        <button id="translateAllBtn">Traduzir Tudo</button>
+      </div>
+
+      <table id="poTable">
+        <thead>
+          <tr>
+            <th>Contexto</th>
+            <th>Original (msgid)</th>
+            <th>Tradução (msgstr)</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          </tbody>
+      </table>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

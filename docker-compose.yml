@@ -1,0 +1,46 @@
+services:
+  model-service:
+    build: ./model-service
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./model-service:/app
+    networks:
+      - po-net
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all # ou um número específico de GPUs, ex: 1
+              capabilities: [gpu]
+    environment:
+      # Se precisar passar alguma variável de ambiente para o modelo (ex: CUDA_VISIBLE_DEVICES)
+      - NVIDIA_VISIBLE_DEVICES=all # Opcional, mas útil para Docker
+
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80" # Nginx rodará na porta 80 dentro do container, e mapeamos para 3000 na máquina host
+    networks:
+      - po-net
+
+  mlflow: # Opcional
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow_server
+    ports:
+      - "5000:5000"
+    networks:
+      - po-net
+    environment:
+      - MLFLOW_TRACKING_URI=file:/mlruns # Usando File Store
+    volumes:
+      - ./mlruns:/mlruns
+    command: mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri file:/mlruns --default-artifact-root file:/mlruns
+    # healthcheck e depends_on removidos aqui
+
+networks:
+  po-net:
+    driver: bridge
+
