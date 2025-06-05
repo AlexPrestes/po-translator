@@ -23,6 +23,8 @@ services:
     build: ./frontend
     ports:
       - "3000:80" # Nginx rodará na porta 80 dentro do container, e mapeamos para 3000 na máquina host
+    depends_on:
+      - model-service
     networks:
       - po-net
 

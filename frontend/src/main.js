@@ -109,7 +109,7 @@ function renderTable() {
  * Envia uma linha de tradução para o model-service para tradução.
  * @param {number} index - O índice do item na array poItems a ser traduzido.
  */
-function translateLine(index) {
+async function translateLine(index) {
   const item = poItems[index];
   console.log(item);
 
@@ -117,45 +117,64 @@ function translateLine(index) {
     alert('Não há texto original (msgid) para traduzir nesta linha.');
     return;
   }
-  console.log(item);
 
-  fetch('/api/translate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      source_text: item.msgid,
-      source_lang: 'en',
-      target_lang: 'pt'
-    })
-  })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Erro na API: ${res.status} ${res.statusText}`);
-      }
-      return res.json();
-    })
-    .then(data => {
-      item.msgstr[0] = data.translated_text;
-      console.log(data.translated_text);
-      renderTable();
-    })
-    .catch(error => {
-      alert('Erro na tradução via API: ' + error.message);
-      console.error('Erro na requisição de tradução:', error);
+  try {
+    const response = await fetch('/api/translate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        source_text: item.msgid,
+        source_lang: 'en',
+        target_lang: 'pt'
+      })
     });
+
+    if (!response.ok) {
+      throw new Error(`Erro na API: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    item.msgstr[0] = data.translated_text;
+    console.log('Tradução:', data.translated_text);
+
+    renderTable();
+  } catch (error) {
+    alert('Erro na tradução via API: ' + error.message);
+    console.error('Erro na requisição de tradução:', error);
+  }
 }
 
 /**
  * Traduz todas as linhas que ainda não possuem tradução.
  */
-function translateAll() {
-  poItems.forEach((item, index) => {
+async function translateAll() {
+  for (let index = 0; index < poItems.length; index++) {
+    const item = poItems[index];
     if (!item.msgstr[0]) {
-      translateLine(index);
+      await translateLine(index);
     }
-  });
+  }
+}
+
+async function loadModels() {
+  try {
+    const response = await fetch('/api/models');
+    const models = await response.json();
+
+    const select = document.getElementById('modelSelect');
+    select.innerHTML = '';
+
+    models.forEach(model => {
+      const option = document.createElement('option');
+      option.value = model.id;
+      option.textContent = model.name;
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error('Erro ao carregar modelos:', error);
+  }
 }
 
 /**

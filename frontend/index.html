@@ -18,6 +18,14 @@
 
       <div class="table-controls">
         <input type="text" id="searchInput" placeholder="Buscar..." />
+        
+        <!-- 🔥 Seletor de modelos -->
+        <label for="modelSelect">Modelo:</label>
+        <select id="modelSelect">
+          <option value="default">Padrão</option>
+          <!-- Opções dinâmicas serão adicionadas via JS -->
+        </select>
+
         <button id="translateAllBtn">Traduzir Tudo</button>
       </div>
 
@@ -38,3 +46,4 @@
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
+
